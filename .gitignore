@@ -1,0 +1,7 @@
+*.pyc
+*.pdf
+/output
+/news_crawler/guardian/texts/*
+*.csv
+/samples/*
+.DS_Store
