@@ -3,6 +3,13 @@ import random
 from models import SVM, Neural_Network
 import numpy as np
 
+'''
+Train a model to classify news and short texts.
+1. Find out the top 1000 occuring words in essays (term paper)
+2. In the articles from Guardian, locate the words and construct a vector for each article
+3. Feed the vectors / matrix and also the labels to train the model 
+'''
+
 _essays_dir = "./samples"
 _n_key_vocabs = 1000
 _ngram_rng = (1, 1)

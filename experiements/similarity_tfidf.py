@@ -3,6 +3,16 @@ import textbook
 import pandas
 import preprocessing
 
+"""
+Computes the similarity between essays and each chapter of the textbook
+We adpoted TFIDF as the similarity measure
+1. find out 50 words from each chapter with the most occurence, so it would be 15*50 in total
+2. use the 750 words to find out the TFIDF values of the chapters
+3. for each essay, count the words to find the TF value 
+	and multiply with the IDF values from step 2 to obtain TFIDF of essays
+4. compute the pairwise similarity between chapters and essays by taking dot products
+"""
+
 sample_folder = "./samples"
 out_file = "similarity.csv"
 n_key_vocabs = 50

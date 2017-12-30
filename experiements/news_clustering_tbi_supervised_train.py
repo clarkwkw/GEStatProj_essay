@@ -4,6 +4,23 @@ from models import SVR
 import numpy as np
 import textbook
 
+"""
+Train a model to classify news and essays into different sections with one model per section
+For each model, the input would be word vectors, and a number ranging 0 - 1 would be the output, 
+indicating the likelihood of the article belonging to the section.
+
+1. Find out the top 1000 occuring words in textbook
+2. Reserve 20% of the articles from Guardian as validation set, the others as training set
+3. For each section, train a model by, 
+	feeding the vectors into the model with labels 0/1, 
+	indicating whether the article belongs to the section.
+4. After the model of a section is trained, check its accuracy by,
+	feeding the vectors of validation set into the model,
+	if the prediction is greater than / equal to 0.5,
+	consider the article to be in the section.
+	Compare the prediction and the true label.
+"""
+
 _essays_dir = "./samples"
 _n_key_vocabs = 1000
 _ngram_rng = (1, 1)

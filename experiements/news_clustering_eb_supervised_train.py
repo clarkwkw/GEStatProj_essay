@@ -3,6 +3,16 @@ import random
 from models import SVM, Neural_Network
 import numpy as np
 
+"""
+Train a model to classify news and essays into different sections using a single model
+There is only 1 model, with word vectors as the input, and a number indicating the section as the prediction 
+1. Find out the top 1000 occuring words in essays (term paper)
+2. Reserve 20% of the articles from Guardian as validation set, the others as training set
+3. Locate the words and construct a vector for each article
+3. Feed the vectors / matrix and also the labels of the training set to train the model 
+4. Check the validation accuracy by comparing prediction on validation set and the real label
+"""
+
 _essays_dir = "./samples"
 _n_key_vocabs = 1000
 _ngram_rng = (1, 1)

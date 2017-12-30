@@ -5,9 +5,21 @@ import textbook
 import nltk
 import pandas
 
+"""
+Computes the similarity between essays and each chapter of the textbook
+The similarity measure (by KaiMing) is defined as:
+1. find out 50 words from each chapter with the most occurence
+2. for each essay,
+	for a chapter,
+		find out the occurence of the 50 words in the essay to construct the word vector,
+		*** scale down the vector of the essay by dividing approximately the number of words in the essay 
+		normalize both vectors (essay and chapter)
+		calculate the dot product
+"""
+
 sample_folder = "./samples"
 out_file = "similarity.csv"
-n_key_vocabs = 30
+n_key_vocabs = 50
 
 def normalize(v):
 	norm = np.linalg.norm(v)
@@ -52,12 +64,15 @@ for j in range(len(textbook._chapter_pg)):
 # Then, calculate cosine similarity
 for i in range(len(samples)):
 	sample_vocab_freq = dict(key_vocabs_all)
+	word_count = 0
 	for token in nltk.word_tokenize(samples[i].text):
+		word_count += 1
 		if token in sample_vocab_freq:
 			sample_vocab_freq[token] += 1
 	for j in range(len(textbook._chapter_pg)):
 		sample_vect = dict_to_arr(sample_vocab_freq, key_vocabs_chapters[j])
-		similarity[i, j] = cal_similarity(sample_vect, chapter_vects[j])
+		sample_vect = sample_vect/word_count
+		similarity[i, j] = np.sum(sample_vect)
 
 similarity_df = pandas.DataFrame(similarity, columns = textbook.getChapterTitles())
 similarity_df.index = [sample.get_identifier() for sample in samples]

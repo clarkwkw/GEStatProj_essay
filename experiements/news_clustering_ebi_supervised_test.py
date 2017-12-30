@@ -7,10 +7,13 @@ import random
 import tensorflow as tf
 import pandas
 
+'''
+Invoke the model trained by news_clustering_ebi_supervised_test.py to perform prediction
+'''
+
 _essay_folder = "./samples"
-_model = "./output/NN"
-_type = "NN"
-_grouped_sections = ['education', 'science & technology', 'environment', 'global-development', 'business']
+_model = "./output"
+_grouped_sections = ['education', 'science & technology', 'environment', 'global-development', 'business', 'culture', 'politics']
 _words = []
 _norm_dict = None
 pca_components = None
@@ -31,22 +34,10 @@ if pca_components is not None:
 	test_matrix = np.matmul(test_matrix, pca_components.T)
 if _norm_dict is not None:
 	test_matrix, _, _ = preprocessing.normalize(test_matrix, norm_info = _norm_dict)
-if _type == "NN":
-	model = models.Neural_Network.load(_model)
-	result = model.predict(test_matrix)
-	df = pandas.DataFrame(preprocessing.dist_softmax(result.T).T)
-	df["name"] = [sample.get_identifier() for sample in samples]
-	df.to_csv("dist.csv", index = False)
-	result = preprocessing.dists_to_labels(result, _grouped_sections)
 
-else:
-	model = models.SVR.load(_model)
-	result = model.predict(test_matrix)
-	
-_result_count = {s: 0 for s in _grouped_sections}
-for i in range(result.shape[0]):
-	section = _grouped_sections[int(result[i])]
-	print("%s\t%s"%(samples[i].get_identifier(), section))
-	_result_count[section] += 1
+result = pandas.DataFrame({"Name": [sample.get_identifier() for sample in samples]}, columns = ["Name"]+_grouped_sections)
+for section in _grouped_sections:
+	model = models.SVR.load("%s/%s"%(_model, section))
+	result[section] = model.predict(test_matrix)
 
-print(_result_count)
+result.to_csv("essay_clustered.csv", index = False)

@@ -3,6 +3,16 @@ import random
 from sklearn.cluster import KMeans
 import numpy as np
 
+"""
+Use the K-means algorithm to cluster news
+1. Find out the bag of words in the articles, and construct the word vectors for all articles
+2. Perform dimentionality reduction to reduce the dimensiom of the vectors
+3. Reserve 20% of articles as validation set
+3. Feed the training vectors into the K-mean algorithm
+4. For each cluster, assign the cluster to a section by majority vote
+5. Compare the prediction on validation set with the true label
+"""
+
 _news_dir = "./news_crawler/guardian/texts"
 _model = "SVM"
 _min_word_count = 400

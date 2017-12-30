@@ -3,6 +3,14 @@ import random
 from models import SVM, Neural_Network
 import numpy as np
 
+"""
+Classify the essays according to their questions by word vectors
+1. Construct the bag of words by extracting words in essays
+2. Construct the word vectors by counting the occurence of words in essays
+3. Reserve 25% of essays as validating dataset
+4. Feed the training dataset and check the accuracy by comparing the prediction on validation set with true label
+"""
+
 _sample_folder = "./samples"
 _batch_name = "TP1"
 _train_ratio = 0.75

@@ -3,6 +3,18 @@ import random
 from models import SVM, Neural_Network
 import numpy as np
 
+"""
+Train a model to classify news and essays into different sections using a single model
+There is only 1 model, with word vectors as the input, and a number indicating the section as the prediction 
+
+1. Find out the bag of words in the articles and construct the word vectors
+2. Perform dimensionalty reduction on the vectors
+3. Reserve 20% of the articles from Guardian as validation set, the others as training set
+4. Locate the words and construct a vector for each article
+5. Feed the vectors / matrix and also the labels of the training set to train the model 
+6. Check the validation accuracy by comparing prediction on validation set and the real label
+"""
+
 _news_dir = "./news_crawler/guardian/texts"
 _model = "NN"
 _min_word_count = 400

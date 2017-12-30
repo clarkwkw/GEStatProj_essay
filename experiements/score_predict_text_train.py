@@ -5,6 +5,17 @@ import os
 import preprocessing
 import random
 
+"""
+Train a model to predict the score of an essay by the word vectors
+1. Construct the bag of 1000 words with the most occurence from the textbook / essays
+2. Construct the word vectors of each essay by counting the occurence of the words in the essay
+3. Split the data into 5 portions
+4. For each portion, 
+	train a model using the other 4 portions of data as training set, and
+	the remaining data as the validation set
+5. Keep the model with the highest validation accuracy
+"""
+
 _sample_folder = "./samples"
 _model_folder = "./output"
 _model_type = "SVM"

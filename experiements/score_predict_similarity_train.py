@@ -5,27 +5,28 @@ import os
 import preprocessing
 import random
 
+"""
+Train a model to predict the score of an essay by the similarity between the essay and the textbook
+1. Construct the bag of words from the textbook
+2. Compute the similarity matrix of the essays and each chapter of the textbook, using TFIDF
+3. Split the data into 5 portions
+4. For each portion, 
+	train a model using the other 4 portions of data as training set, and
+	the remaining data as the validation set
+5. Keep the model with the highest validation accuracy
+"""
+
 _sample_folder = "./samples"
 _model_folder = "./output"
 _name_filter = ["KK201617T1", "KK201617T2"]
-
-# Preprocessing Parameters
-_attributes = 50
+_tb_chs = ["1a", "1b", "2", "3a", "3b", "4", "5", "6", "7", "8", "9", "10a", "10b", "11a"]
 _cross_valid = 5
-_strategy_parameters = {
-	"ngram_rng": (1, 3),
-	"words_src": "samples",
-	"reduction": "lsa",
-	"reduce_n_attr": 50,
-	"normalize_flag": False,
-	"stem_words": False
-}
 
 _svm_parameters = {
+	
 }
 
 def get_label(sample):
-	#return sample.think + sample.understand + sample.lang + sample.pres
 	return sample.think + sample.understand
 
 def mkdir(dir):
@@ -33,6 +34,7 @@ def mkdir(dir):
 		os.mkdir(dir)
 	except FileExistsError:
 		pass
+
 
 def main(run = 1, force_run = False):
 	mkdir(_model_folder)
@@ -45,7 +47,7 @@ def main(run = 1, force_run = False):
 		samples = preprocessing.tp_sample.get_samples(_sample_folder)
 		if _name_filter is not None:
 			samples = [s for s in samples if s.batch_name in _name_filter]
-		print("Variance: %.3f"%np.var([get_label(s) for s in samples]))
+		print(np.var([get_label(s) for s in samples]))
 		random.shuffle(samples)
 		batches = preprocessing.batch_data(samples, _cross_valid)
 		for i in range(_cross_valid):
@@ -59,25 +61,22 @@ def main(run = 1, force_run = False):
 				if j != i:
 					train_samples.extend(batches[j])
 			
-			train_texts = [sample.comment for sample in train_samples]
-			valid_texts = [sample.comment for sample in valid_samples]
-			train_matrix, valid_matrix, words = preprocessing.preprocess(train_texts, valid_texts, savedir = savedir, **_strategy_parameters)
-			
-			#print("\tBag of words: %d"%len(words))
+			train_matrix = preprocessing.tb_similarity(train_samples, chs = _tb_chs)
+			valid_matrix = preprocessing.tb_similarity(valid_samples, chs = _tb_chs)
 
 			train_labels = np.asarray([get_label(sample) for sample in train_samples])
 			valid_labels = np.asarray([get_label(sample) for sample in valid_samples])
-			model, valid_mse = None, None
-			
+
 			model = SVR(**_svm_parameters)
 			valid_mse = model.train(train_matrix, train_labels, valid_matrix, valid_labels)
+
 			model.save(savedir)
 			model.destroy()
 
 			print("Fold %2d: %.4f"%(i+1, valid_mse))
 
 if __name__ == "__main__":
-	main(1, False)
+	main(4, False)
 	'''
 	while _strategy_parameters["bottom"] >= 0:
 		print("%s-%s: %d, %d"%(_strategy_parameters["words"], _strategy_parameters["selection"], _strategy_parameters["top"], _strategy_parameters["bottom"]))
