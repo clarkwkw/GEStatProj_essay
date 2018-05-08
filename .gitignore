@@ -5,3 +5,6 @@
 *.csv
 /samples/*
 .DS_Store
+/glove/*.bin
+/glove/*.txt
+*.zip

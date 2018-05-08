@@ -1,6 +1,7 @@
 import re
 import os
 import json
+from . import utils
 
 def get_samples(sample_folder):
 	try:
@@ -15,7 +16,8 @@ def get_samples(sample_folder):
 		if ext == '.json':
 			try:
 				samples.append(TPSample(sample_folder + '/' + file))
-			except:
+			except Exception as e:
+				raise e
 				print("Cannot read sample %s"%name)
 	return samples
 
@@ -35,7 +37,8 @@ class TPSample:
 		self.lang = json_dict["score"]["lang"]
 		self.pres = json_dict["score"]["pres"]
 
-		self.text = json_dict["text"].encode("ascii", "ignore")
+		self.text = json_dict["text"]
+		self.text = utils.clean_string(self.text)
 
 		if "comment" in json_dict:
 			self.comment = json_dict["comment"]
