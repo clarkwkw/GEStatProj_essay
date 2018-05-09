@@ -2,6 +2,7 @@ import os
 import numpy as np
 from . import utils
 import re
+import nltk
 
 # Adapted from https://github.com/siyuanzhao/automated-essay-grading/blob/master/data_utils.py
 
@@ -49,19 +50,20 @@ def texts_to_idx(texts, maxlen):
 
 	E = np.zeros((len(texts), maxlen), dtype = np.int32)
 	i = 0
+	max_sample_len = 0
 	for text in texts:
-		tokens = [x.strip() for x in re.split(r'(\W+)?', text) if x.strip()]
-
 		wc = 0
-		for w in tokens:
+		for w in nltk.tokenize.word_tokenize(text):
 			if wc >= maxlen:
 				break
-				
-			E[i, wc] = WORD_IDX.get(w, 0)
-			wc += 1
+			
+			if w.isalpha():
+				E[i, wc] = WORD_IDX.get(w.lower(), 0)
+				wc += 1
 
 		i += 1
-
+		max_sample_len = max(max_sample_len, wc)
+	print("Max_len:", max_sample_len)
 	return E
 
 

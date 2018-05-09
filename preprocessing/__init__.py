@@ -5,3 +5,4 @@ from .simple_stats import *
 from .similarity import *
 from . import news_sample
 from . import glove
+from . import nea
