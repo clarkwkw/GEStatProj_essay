@@ -1,6 +1,7 @@
 import nltk
 import re
 import numpy as np
+from .utils import ENGLISH_STOP_WORDS
 
 # adapt from https://github.com/nusnlp/nea/blob/master/nea/asap_reader.py
 NUM_REGEX = re.compile(r'^[+-]?[0-9]+\.?[0-9]*$')
@@ -8,13 +9,15 @@ NUM_REGEX = re.compile(r'^[+-]?[0-9]+\.?[0-9]*$')
 def is_number(token):
 	return bool(NUM_REGEX.match(token))
 
-def create_vocab(texts, exclude_stop_words = True, vocab_size = None):
+def create_vocab(texts, exclude_stop_words = False, vocab_size = None):
 	vocab_freq = {}
 
 	for text in texts:
 		for token in nltk.tokenize.word_tokenize(text):
 			token = token.lower()
-			if token.isalpha():
+			if exclude_stop_words and token in ENGLISH_STOP_WORDS:
+				continue
+			elif token.isalpha():
 				vocab_freq[token] = vocab_freq.get(token, 0) + 1
 
 	print("# Unique words: %d"%len(vocab_freq))
@@ -31,10 +34,11 @@ def create_vocab(texts, exclude_stop_words = True, vocab_size = None):
 
 	return vocab
 
-def texts_to_vec(texts, vocab, seq_len):
+def texts_to_vec(texts, vocab, seq_len, exclude_stop_words = False):
 	vecs = []
 	n_total_words, n_unk, n_num = 0, 0, 0
-	vecs = np.zeros((len(texts), seq_len), dtype = np.int32)
+	vecs = np.full((len(texts), seq_len), vocab['<pad>'], dtype = np.int32)
+	max_len = 0
 
 	text_count = 0
 	for text in texts:
@@ -50,7 +54,9 @@ def texts_to_vec(texts, vocab, seq_len):
 				token_count += 1
 
 			elif token.isalpha():
-				if token in vocab:
+				if exclude_stop_words and token in ENGLISH_STOP_WORDS:
+					continue
+				elif token in vocab:
 					vecs[text_count, token_count] = vocab[token]
 				else:
 					vecs[text_count, token_count] = vocab['<unk>']
@@ -59,10 +65,12 @@ def texts_to_vec(texts, vocab, seq_len):
 
 		text_count += 1
 		n_total_words += token_count
+		max_len = max(max_len, token_count)
 
 	print("# <num>: %d"%n_num)
 	print("# <unk>: %d"%n_unk)
 	print("# total words: %d"%n_total_words)
+	print("# max length: %d"%max_len)
 
 	return vecs
 
