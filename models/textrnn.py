@@ -1,6 +1,7 @@
 import tensorflow as tf
 import numpy as np
 from . import utils
+import json
 
 class TextRNN:
 	def __init__(self, response_length, embedding_n_vocab, embedding_dim, cnn_ngrams, learning_rate, from_save = None):
@@ -71,7 +72,7 @@ class TextRNN:
 					}
 				)
 
-				if (print_loss + 1)%10 == 0:
+				if print_loss and (i + 1)%10 == 0:
 					print("#%d: %.4f"%(i + 1, train_loss))
 
 		tf.reset_default_graph()
