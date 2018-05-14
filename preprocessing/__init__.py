@@ -6,3 +6,5 @@ from .similarity import *
 from . import news_sample
 from . import glove
 from . import nea
+from . import kaggle
+from . import score

@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+from . import utils
 
 class TextRNN:
 	def __init__(self, response_length, embedding_n_vocab, embedding_dim, cnn_ngrams, learning_rate, from_save = None):
@@ -88,10 +89,11 @@ class TextRNN:
 
 		return prediction
 
-	def score(self, response_matrix, labels):
+	# R^2 Score
+	def score(self, response_matrix, labels, return_prediction = False):
 		with self._graph.as_default() as g:
-			loss = self._sess.run(
-				self._loss,
+			loss, prediction = self._sess.run(
+				[self._loss, self._prediction],
 				feed_dict = {
 					self._query: response_matrix,
 					self._label: labels
@@ -100,4 +102,33 @@ class TextRNN:
 
 		tf.reset_default_graph()
 
-		return 1 - loss/np.var(labels)
+		score = 1 - loss/np.var(labels)
+		if not return_prediction:
+			return score
+
+		return score, prediction
+
+	def save(self, savedir):
+		utils.ensure_dir_exist(savedir)
+		with self._graph.as_default() as g:
+			saver = tf.train.Saver()
+			save_path = saver.save(self._sess, save_path = savedir+'/model.ckpt')
+		tf.reset_default_graph()
+		
+		with open(savedir+"/model_conf.json", "w") as f:
+			init_para = {
+				"response_length": self._response_length,
+				"embedding_n_vocab": self._embedding_n_vocab,
+				"embedding_dim": self._embedding_dim,
+				"cnn_ngrams": self._cnn_ngrams,
+				"learning_rate": self._learning_rate
+			}
+			f.write(json.dumps(init_para, indent = 4))
+
+	@staticmethod
+	def load(savedir):
+		init_para = None
+		with open(savedir+"/model_conf.json", "r") as f:
+			init_para = json.load(f)
+		model = TextRNN(from_save = savedir, **init_para)
+		return model

@@ -8,3 +8,4 @@
 /glove/*.bin
 /glove/*.txt
 *.zip
+*.tsv
