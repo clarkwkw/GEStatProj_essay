@@ -2,13 +2,15 @@ import codecs
 from . import utils
 
 # Adapted from: https://github.com/nusnlp/nea/blob/master/nea/asap_reader.py
-def get_samples(tsv_file_path):
+def get_samples(tsv_file_path, prompt_ids):
 	samples = []
 	with codecs.open(tsv_file_path, mode = 'r', encoding = 'UTF8', errors = 'ignore') as f:
 		next(f)
 		for line in f:
 			tokens = line.strip().split("\t")
 			essay_set, essay_id = tokens[1], tokens[0]
+			if int(essay_set) not in prompt_ids:
+				continue
 			text = tokens[2]
 			score = float(tokens[6])
 			samples.append(ASAPSample(essay_set, essay_id, text, score))

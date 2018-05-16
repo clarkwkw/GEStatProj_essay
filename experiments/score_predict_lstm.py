@@ -8,6 +8,7 @@ _model_folder = "./output"
 _name_filter = ["KK201617T1", "KK201617T2"]
 
 _asap_file = "./kaggle_data/training_set_rel3.tsv"
+_asap_prompt_ids = [7, 8]
 
 _cnn_ngrams = 3
 _learning_rate = 1e-3
@@ -29,7 +30,7 @@ def main():
 	#samples = preprocessing.tp_sample.get_samples(_sample_folder)
 	#sample_labels = np.reshape([get_label(s) for s in samples], [-1, 1])
 	
-	samples = preprocessing.kaggle.get_samples(_asap_file)
+	samples = preprocessing.kaggle.get_samples(_asap_file, _asap_prompt_ids)
 	sample_labels = np.reshape([get_asap_label(s) for s in samples], [-1, 1])
 	
 	sample_texts = [s.text for s in samples]
