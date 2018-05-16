@@ -28,10 +28,15 @@ def get_samples(sample_folder):
 				print("Cannot read sample %s"%name)
 	return samples
 
+# adapt from https://stackoverflow.com/questions/9590382/forcing-python-json-module-to-work-with-ascii
+def ascii_encode_dict(data):
+	ascii_encode = lambda x: x.encode('ascii')
+	return dict(map(ascii_encode, pair) for pair in data.items())
+
 class TPSample:
 	def __init__(self, path):
 		with open(path, "r") as f:
-			json_dict = json.load(f)
+			json_dict = json.load(f, object_hook = ascii_encode_dict)
 
 		self.type = json_dict["type"]
 		self.batch_name = json_dict["batch_name"]

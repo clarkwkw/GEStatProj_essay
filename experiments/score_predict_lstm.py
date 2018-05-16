@@ -20,6 +20,11 @@ _max_len = 400
 _max_iter = 300
 _batch_size = 128
 _exclude_stop_words = False
+_qwk_score_levels = np.asarray(list(range(
+	preprocessing.kaggle.asap_ranges[_asap_prompt_ids[0]][0],
+	preprocessing.kaggle.asap_ranges[_asap_prompt_ids[0]][1] + 1
+)))
+#_qwk_score_levels = np.asarray(list(range(14 * 2 + 1))) / 2
 
 def normalize(labels):
 	return labels/14.0
@@ -68,7 +73,7 @@ def main():
 
 		model.save("output/lstm_%d"%(i+1))
 
-		print("\tQWK: %.4f"%preprocessing.score.calculate_qwk(None, sample_labels[valid_idx], unnormalized_pred))
+		print("\tQWK: %.4f"%preprocessing.score.calculate_qwk(_qwk_score_levels, sample_labels[valid_idx], unnormalized_pred))
 
 main()
 
