@@ -56,9 +56,9 @@ def calculate_qwk(score_levels, truth, predictions):
 		max_score = int(max(max(truth), max(predictions)))
 		print("Inferred from input: min. score = %d, max. score = %d"%(min_score, max_score))
 		score_levels = list(range(min_score, max_score + 1))
-
+	
+	print(predictions[0:10])
 	predictions = closest_level(score_levels, predictions)
-	print(score_levels[0:10])
 	print(predictions[0:10])
 	hist_truth = histogram(score_levels, truth)
 	hist_predict = histogram(score_levels, predictions)
