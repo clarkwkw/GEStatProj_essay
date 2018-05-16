@@ -52,6 +52,6 @@ class ASAPSample:
 		if score is None:
 			score = self.__score
 
-		low, high = asap_ranges[prompt_id] 
+		low, high = asap_ranges[self.__essay_set] 
 
 		return score * (high - low) + low
