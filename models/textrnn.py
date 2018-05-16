@@ -64,7 +64,7 @@ class TextRNN:
 
 		tf.reset_default_graph()
 
-	def train(self, response_matrix, labels, max_iter, batch_size, print_loss = False):
+	def train(self, response_matrix, labels, max_iter, batch_size, valid_response = None, valid_labels = None, print_loss = False):
 		with self._graph.as_default() as g:
 			dataset = tf.data.Dataset.from_tensor_slices((response_matrix, labels)).batch(batch_size).repeat()
 			iter = dataset.make_one_shot_iterator()
@@ -73,7 +73,7 @@ class TextRNN:
 			for i in range(max_iter):
 				batch_response, batch_label = self._sess.run(get_next)
 
-				_, train_loss = self._sess.run(
+				_, loss = self._sess.run(
 					[self._optimizer, self._loss], 
 					feed_dict = {
 						self._query: batch_response,
@@ -82,7 +82,15 @@ class TextRNN:
 				)
 
 				if print_loss and (i + 1)%10 == 0:
-					print("#%d: %.4f"%(i + 1, train_loss))
+					if valid_response is not None and valid_labels is not None:
+						loss = self._sess.run(
+							self._loss, 
+							feed_dict = {
+								self._query: valid_response,
+								self._label: valid_labels
+							}
+						)
+					print("#%d: %.4f"%(i + 1, loss))
 
 		tf.reset_default_graph()
 

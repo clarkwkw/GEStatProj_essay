@@ -8,17 +8,17 @@ _model_folder = "./output"
 _name_filter = ["KK201617T1", "KK201617T2"]
 
 _asap_file = "./kaggle_data/training_set_rel3.tsv"
-_asap_prompt_ids = [3, 4]
+_asap_prompt_ids = [3]
 
 _cnn_ngrams = 3
 _learning_rate = 1e-3
 _k_fold = 5
 _vocab_size = 4000
 _embedding_dim = 30
-_max_len = 450
+_max_len = 400
 _max_iter = 100
 _batch_size = 128
-_exclude_stop_words = True
+_exclude_stop_words = False
 def get_label(sample):
 	return sample.think + sample.understand + sample.lang + sample.pres
 
@@ -27,11 +27,11 @@ def get_asap_label(sample):
 
 def main():
 	print("Loading samples..")
-	samples = preprocessing.tp_sample.get_samples(_sample_folder)
-	sample_labels = np.reshape([get_label(s) for s in samples], [-1, 1])
+	#samples = preprocessing.tp_sample.get_samples(_sample_folder)
+	#sample_labels = np.reshape([get_label(s) for s in samples], [-1, 1])
 	
-	#samples = preprocessing.kaggle.get_samples(_asap_file, _asap_prompt_ids)
-	#sample_labels = np.reshape([get_asap_label(s) for s in samples], [-1, 1])
+	samples = preprocessing.kaggle.get_samples(_asap_file, _asap_prompt_ids)
+	sample_labels = np.reshape([get_asap_label(s) for s in samples], [-1, 1])
 	
 	sample_texts = [s.text for s in samples]
 	vocab = preprocessing.nea.create_vocab(sample_texts, exclude_stop_words = _exclude_stop_words, vocab_size = _vocab_size)
@@ -53,7 +53,7 @@ def main():
 		model = TextRNN(_max_len, len(vocab), _embedding_dim, _cnn_ngrams, _learning_rate)
 
 		print("\tTraining..")
-		model.train(sample_vecs[train_idx], sample_labels[train_idx], _max_iter, _batch_size, True)
+		model.train(sample_vecs[train_idx], sample_labels[train_idx], _max_iter, _batch_size, valid_response = sample_vecs[valid_idx], valid_labels = sample_labels[valid_idx], print_loss = True)
 
 		r2_score, pred = model.score(sample_vecs[valid_idx], sample_labels[valid_idx], return_prediction = True)
 		print("\tValid R^2: %.4f"%(r2_score))
