@@ -57,9 +57,9 @@ def calculate_qwk(score_levels, truth, predictions):
 		print("Inferred from input: min. score = %d, max. score = %d"%(min_score, max_score))
 		score_levels = list(range(min_score, max_score + 1))
 
-	weight_matrix = np.zeros((len(score_levels), len(score_levels)))
-
 	predictions = closest_level(score_levels, predictions)
+	print(score_levels[0:10])
+	print(predictions[0:10])
 	hist_truth = histogram(score_levels, truth)
 	hist_predict = histogram(score_levels, predictions)
 	confusion = confusion_matrix(score_levels, truth, predictions)
