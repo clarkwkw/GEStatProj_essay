@@ -51,7 +51,7 @@ def calculate_qwk(score_levels, truth, predictions):
 	else:
 		min_score = min(min(truth), min(predictions))
 		max_score = max(max(truth), max(predictions))
-		score_levels = list(range(min_score, max_score + 1))
+		score_levels = int(list(range(min_score, max_score + 1)))
 
 	weight_matrix = np.zeros((len(score_levels), len(score_levels)))
 
