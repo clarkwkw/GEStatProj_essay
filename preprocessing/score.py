@@ -46,6 +46,9 @@ def confusion_matrix(levels, truth, predictions):
 # truth: list/array of real scores
 # predictions: list/array of predicted scores
 def calculate_qwk(score_levels, truth, predictions):
+	truth = np.reshape(np.asarray(truth), (-1))
+	predictions = np.reshape(np.asarray(predictions), (-1))
+	
 	if score_levels is not None:
 		score_levels = sorted(score_levels)
 	else:
