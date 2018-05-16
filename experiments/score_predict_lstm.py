@@ -16,7 +16,7 @@ _k_fold = 5
 _vocab_size = 4000
 _embedding_dim = 30
 _max_len = 400
-_max_iter = 100
+_max_iter = 300
 _batch_size = 128
 _exclude_stop_words = False
 def get_label(sample):
