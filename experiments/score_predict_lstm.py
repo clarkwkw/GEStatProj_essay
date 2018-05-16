@@ -22,13 +22,16 @@ _exclude_stop_words = False
 def get_label(sample):
 	return sample.think + sample.understand + sample.lang + sample.pres
 
+def normalize(labels):
+	return labels/14.0
+
 def get_asap_label(sample):
 	return sample.score
 
 def main():
 	print("Loading samples..")
 	#samples = preprocessing.tp_sample.get_samples(_sample_folder)
-	#sample_labels = np.reshape([get_label(s) for s in samples], [-1, 1])
+	#sample_labels = normalize(np.reshape([get_label(s) for s in samples], [-1, 1]))
 	
 	samples = preprocessing.kaggle.get_samples(_asap_file, _asap_prompt_ids)
 	sample_labels = np.reshape([get_asap_label(s) for s in samples], [-1, 1])
