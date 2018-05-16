@@ -3,6 +3,13 @@ import os
 import json
 from . import utils
 
+score_range = {
+	"think": 6,
+	"understand": 4,
+	"lang": 2,
+	"pres": 2 
+}
+
 def get_samples(sample_folder):
 	try:
 		files = os.listdir(sample_folder)
@@ -36,6 +43,7 @@ class TPSample:
 		self.understand = json_dict["score"]["understand"]
 		self.lang = json_dict["score"]["lang"]
 		self.pres = json_dict["score"]["pres"]
+		self.score_dict = json_dict["score"]
 
 		self.text = json_dict["text"]
 		self.text = utils.clean_string(self.text)
@@ -47,3 +55,18 @@ class TPSample:
 		
 	def get_identifier(self):
 		return self.type+'-'+self.batch_name+'-'+self.batch_no
+
+	def normalized_score(self, components):
+		total, max_total = 0.0, 0.0
+		for c in components:
+			total += self.score_dict[c]
+			max_total += asap_range[c]
+
+		return 1.0*total/max_total
+
+	def unnormalize(self, score, components):
+		max_total = 0.0
+		for c in components:
+			max_total += asap_range[c]
+
+		return score*max_total

@@ -13,6 +13,7 @@ asap_ranges = {
 	7: (0,30),
 	8: (0,60)
 }
+
 def get_samples(tsv_file_path, prompt_ids):
 	samples = []
 	with codecs.open(tsv_file_path, mode = 'r', encoding = 'UTF8', errors = 'ignore') as f:
@@ -41,9 +42,16 @@ class ASAPSample:
 	def text(self):
 		return self.__text
 
-	@property 
-	def score(self):
+	def get_identifier(self):
+		return str(self.__essay_set) + "-" + str(self.__essay_id)
+
+	def normalized_score(self, components = []):
 		return self.__score
 
-	def get_identifier(self):
-		return self.__essay_set + "-" + self.__essay_id
+	def unnormalize(self, score = None, components = []):
+		if score is None:
+			score = self.__score
+
+		low, high = asap_ranges[prompt_id] 
+
+		return score * (high - low) + low
