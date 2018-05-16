@@ -16,6 +16,7 @@ _vocab_size = 4000
 _embedding_dim = 30
 _max_len = 450
 _max_iter = 100
+_batch_size = 128
 _exclude_stop_words = True
 def get_label(sample):
 	return sample.think + sample.understand + sample.lang + sample.pres
@@ -51,7 +52,7 @@ def main():
 		model = TextRNN(_max_len, len(vocab), _embedding_dim, _cnn_ngrams, _learning_rate)
 
 		print("\tTraining..")
-		model.train(sample_vecs[train_idx], sample_labels[train_idx], _max_iter, True)
+		model.train(sample_vecs[train_idx], sample_labels[train_idx], _max_iter, _batch_size, True)
 
 		r2_score, pred = model.score(sample_vecs[valid_idx], sample_labels[valid_idx], return_prediction = True)
 		print("\tValid R^2: %.4f"%(r2_score))

@@ -61,14 +61,20 @@ class TextRNN:
 
 		tf.reset_default_graph()
 
-	def train(self, response_matrix, labels, max_iter, print_loss = False):
+	def train(self, response_matrix, labels, max_iter, batch_size, print_loss = False):
 		with self._graph.as_default() as g:
+			dataset = tf.data.Dataset.from_tensor_slices((response_matrix, labels)).batch(batch_size).repeat()
+			iter = dataset.make_one_shot_iterator()
+			get_next = iter.get_next()
+
 			for i in range(max_iter):
+				batch_response, batch_label = self._sess.run(get_next)
+				
 				_, train_loss = self._sess.run(
 					[self._optimizer, self._loss], 
 					feed_dict = {
-						self._query: response_matrix,
-						self._label: labels
+						self._query: batch_response,
+						self._label: batch_label
 					}
 				)
 
