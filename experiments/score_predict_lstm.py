@@ -27,11 +27,11 @@ def get_asap_label(sample):
 
 def main():
 	print("Loading samples..")
-	#samples = preprocessing.tp_sample.get_samples(_sample_folder)
-	#sample_labels = np.reshape([get_label(s) for s in samples], [-1, 1])
+	samples = preprocessing.tp_sample.get_samples(_sample_folder)
+	sample_labels = np.reshape([get_label(s) for s in samples], [-1, 1])
 	
-	samples = preprocessing.kaggle.get_samples(_asap_file, _asap_prompt_ids)
-	sample_labels = np.reshape([get_asap_label(s) for s in samples], [-1, 1])
+	#samples = preprocessing.kaggle.get_samples(_asap_file, _asap_prompt_ids)
+	#sample_labels = np.reshape([get_asap_label(s) for s in samples], [-1, 1])
 	
 	sample_texts = [s.text for s in samples]
 	vocab = preprocessing.nea.create_vocab(sample_texts, exclude_stop_words = _exclude_stop_words, vocab_size = _vocab_size)
