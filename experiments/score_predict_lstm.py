@@ -58,7 +58,7 @@ def main():
 		r2_score, pred = model.score(sample_vecs[valid_idx], sample_labels[valid_idx], return_prediction = True)
 		print("\tValid R^2: %.4f"%(r2_score))
 
-		model.save("output/lstm")
+		model.save("output/lstm_%d"%(i+1))
 
 		print("\tQWK: %.4f"%preprocessing.score.calculate_qwk(None, sample_labels[valid_idx], pred))
 

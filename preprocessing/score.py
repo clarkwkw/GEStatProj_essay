@@ -48,12 +48,13 @@ def confusion_matrix(levels, truth, predictions):
 def calculate_qwk(score_levels, truth, predictions):
 	truth = np.reshape(np.asarray(truth), (-1))
 	predictions = np.reshape(np.asarray(predictions), (-1))
-	
+
 	if score_levels is not None:
 		score_levels = sorted(score_levels)
 	else:
 		min_score = int(min(min(truth), min(predictions)))
 		max_score = int(max(max(truth), max(predictions)))
+		print("Inferred from input: min. score = %d, max. score = %d"%(min_score, max_score))
 		score_levels = list(range(min_score, max_score + 1))
 
 	weight_matrix = np.zeros((len(score_levels), len(score_levels)))
