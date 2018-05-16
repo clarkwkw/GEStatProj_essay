@@ -33,7 +33,10 @@ class TextRNN:
 
 				rnn_input = tf.unstack(cnn_layer, axis = 1)
 				lstm_fw_cell = tf.contrib.rnn.BasicLSTMCell(self._embedding_dim, forget_bias = 1.0, activation = tf.tanh)
+				lstm_fw_cell = tf.contrib.rnn.DropoutWrapper(lstm_fw_cell, input_keep_prob = 0.5, state_keep_prob = 0.9, output_keep_prob = 0.5)
 				lstm_bw_cell = tf.contrib.rnn.BasicLSTMCell(self._embedding_dim, forget_bias = 1.0, activation = tf.tanh)
+				lstm_bw_cell = tf.contrib.rnn.DropoutWrapper(lstm_bw_cell, input_keep_prob = 0.5, state_keep_prob = 0.9, output_keep_prob = 0.5)
+				
 				outputs, _, _ = tf.contrib.rnn.static_bidirectional_rnn(lstm_fw_cell, lstm_bw_cell, rnn_input, dtype = tf.float32)
 				output_all = tf.stack(outputs)
 				
@@ -69,7 +72,7 @@ class TextRNN:
 
 			for i in range(max_iter):
 				batch_response, batch_label = self._sess.run(get_next)
-				
+
 				_, train_loss = self._sess.run(
 					[self._optimizer, self._loss], 
 					feed_dict = {
