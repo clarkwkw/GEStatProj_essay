@@ -8,7 +8,7 @@ _model_folder = "./output"
 _name_filter = ["KK201617T1", "KK201617T2"]
 
 _asap_file = "./kaggle_data/training_set_rel3.tsv"
-_asap_prompt_ids = [7, 8]
+_asap_prompt_ids = [3, 4]
 
 _cnn_ngrams = 3
 _learning_rate = 1e-3
