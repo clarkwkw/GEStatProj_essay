@@ -3,6 +3,9 @@ import numpy as np
 from . import utils
 import json
 
+# Based on "A Neural Approach to Automated Essay Scoring" (Taghipour & Ng, 2016)
+# Original implementation: https://github.com/nusnlp/nea
+
 class TextRNN:
 	def __init__(self, response_length, embedding_n_vocab, embedding_dim, cnn_ngrams, learning_rate, from_save = None):
 		self._response_length = response_length
@@ -58,7 +61,7 @@ class TextRNN:
 				saver.restore(self._sess, from_save+'/model.ckpt')
 				self._query = g.get_tensor_by_name("query:0")
 				self._label = g.get_tensor_by_name("label:0")
-				self._prediction =  tf.get_collection("prediction")[0]
+				self._prediction =  tf.get_collection("pred")[0]
 				self._loss =  tf.get_collection("loss")[0]
 				self._optimizer =  tf.get_collection("optimizer")[0]
 
@@ -90,7 +93,7 @@ class TextRNN:
 								self._label: valid_labels
 							}
 						)
-					print("#%d: %.4f"%(i + 1, loss))
+					print("\t#%d: %.4f"%(i + 1, loss))
 
 		tf.reset_default_graph()
 

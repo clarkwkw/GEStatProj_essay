@@ -2,6 +2,7 @@ import os, errno
 import re
 import sys
 import pickle
+import unicodedata
 
 # Copied from https://github.com/scikit-learn/scikit-learn/blob/master/sklearn/feature_extraction/stop_words.py
 ENGLISH_STOP_WORDS = frozenset([
@@ -97,3 +98,33 @@ def pickle_load_large(filepath):
 	obj = pickle.loads(bytes_in)
 	
 	return obj
+
+def utf8_to_ascii(s):
+	s = unicode(s, "utf-8")
+	return unicodedata.normalize('NFKD', s).encode('ascii','ignore')
+
+def _decode_list(data):
+	rv = []
+	for item in data:
+		if isinstance(item, str):
+			item = item.encode('ascii', "ignore").decode("ascii")
+		elif isinstance(item, list):
+			item = _decode_list(item)
+		elif isinstance(item, dict):
+			item = _decode_dict(item)
+		rv.append(item)
+	return rv
+
+def _decode_dict(data):
+	rv = {}
+	for key, value in data.items():
+		if isinstance(key, str):
+			key = key.encode('ascii', "ignore").decode("ascii")
+		if isinstance(value, str):
+			value = value.encode('ascii', "ignore").decode("ascii")
+		elif isinstance(value, list):
+			value = _decode_list(value)
+		elif isinstance(value, dict):
+			value = _decode_dict(value)
+		rv[key] = value
+	return rv

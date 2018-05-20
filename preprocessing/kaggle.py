@@ -24,10 +24,9 @@ def get_samples(tsv_file_path, prompt_ids):
 			if essay_set not in prompt_ids:
 				continue
 			text = tokens[2]
-			score = (float(tokens[6]) - asap_ranges[essay_set][0])/(asap_ranges[essay_set][1] - asap_ranges[essay_set][0])
+			score = float(tokens[6])
 			samples.append(ASAPSample(essay_set, essay_id, text, score))
 
-	print("# samples: %d"%len(samples))
 	return samples
 
 
@@ -45,8 +44,11 @@ class ASAPSample:
 	def get_identifier(self):
 		return str(self.__essay_set) + "-" + str(self.__essay_id)
 
-	def normalized_score(self, components = []):
+	def score(self, components = []):
 		return self.__score
+
+	def normalized_score(self, components = []):
+		return (self.__score - asap_ranges[self.__essay_set][0])/(asap_ranges[self.__essay_set][1] - asap_ranges[self.__essay_set][0])
 
 	def unnormalize(self, score = None, components = []):
 		if score is None:

@@ -58,6 +58,7 @@ def calculate_qwk(score_levels, truth, predictions):
 		score_levels = list(range(min_score, max_score + 1))
 	
 	predictions = closest_level(score_levels, predictions)
+	truth = closest_level(score_levels, truth)
 	hist_truth = histogram(score_levels, truth)
 	hist_predict = histogram(score_levels, predictions)
 	confusion = confusion_matrix(score_levels, truth, predictions)

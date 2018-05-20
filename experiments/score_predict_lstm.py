@@ -2,6 +2,7 @@ from models import TextRNN
 import random
 import preprocessing
 import numpy as np
+import json
 
 _sample_folder = "./samples"
 _model_folder = "./output"
@@ -16,28 +17,28 @@ _learning_rate = 1e-3
 _k_fold = 5
 _vocab_size = 4000
 _embedding_dim = 30
-_max_len = 400
+_max_len = 1000
 _max_iter = 300
 _batch_size = 128
-_exclude_stop_words = False
+_exclude_stop_words = True
+'''
 _qwk_score_levels = np.asarray(list(range(
 	preprocessing.kaggle.asap_ranges[_asap_prompt_ids[0]][0],
 	preprocessing.kaggle.asap_ranges[_asap_prompt_ids[0]][1] + 1
 )))
-#_qwk_score_levels = np.asarray(list(range(14 * 2 + 1))) / 2
+'''
+_qwk_score_levels = np.asarray(list(range(14 * 2 + 1))) / 2
 
-def normalize(labels):
-	return labels/14.0
+_test_model_dir = "output/lstm_1"
 
-def get_asap_label(sample):
-	return sample.score
-
-def main():
+def train():
 	print("Loading samples..")
-	#samples = preprocessing.tp_sample.get_samples(_sample_folder)
+	samples = preprocessing.tp_sample.get_samples(_sample_folder)
 
-	samples = preprocessing.kaggle.get_samples(_asap_file, _asap_prompt_ids)
+	#samples = preprocessing.kaggle.get_samples(_asap_file, _asap_prompt_ids)
 	
+	print("# samples: %d"%len(samples))
+
 	sample_labels = np.reshape([s.normalized_score(_score_components) for s in samples], [-1, 1])
 	sample_texts = [s.text for s in samples]
 	vocab = preprocessing.nea.create_vocab(sample_texts, exclude_stop_words = _exclude_stop_words, vocab_size = _vocab_size)
@@ -65,15 +66,54 @@ def main():
 
 		print("\tValid R^2: %.4f"%(r2_score))
 
-		unnormalized_pred = []
-		for i in range(pred.shape[0]):
-			idx = valid_idx[i]
-			raw_score = samples[idx].unnormalize(pred[i], _score_components)
+		unnormalized_pred, unnormalized_labels = [], []
+		for j in range(pred.shape[0]):
+			idx = valid_idx[j]
+			raw_score = samples[idx].unnormalize(pred[j], _score_components)
 			unnormalized_pred.append(raw_score)	
 
+		for idx in valid_idx:
+			unnormalized_labels.append(samples[idx].score(_score_components))
+
+		print("\tQWK: %.4f"%preprocessing.score.calculate_qwk(_qwk_score_levels, unnormalized_labels, unnormalized_pred))
+		
 		model.save("output/lstm_%d"%(i+1))
+		with open("output/lstm_%d/vocab.json"%(i+1), "w") as f:
+			json.dump(vocab, f, indent = 4)
 
-		print("\tQWK: %.4f"%preprocessing.score.calculate_qwk(_qwk_score_levels, sample_labels[valid_idx], unnormalized_pred))
+		exit()
 
-main()
+def test():
 
+	print("Loading model..")
+	model = TextRNN.load(_test_model_dir)
+	with open(_test_model_dir + "/vocab.json", "r") as f:
+			vocab = json.load(f)
+
+	print("Loading samples..")
+	#samples = preprocessing.tp_sample.get_samples(_sample_folder)
+
+	samples = preprocessing.kaggle.get_samples(_asap_file, _asap_prompt_ids)
+
+	print("# samples: %d"%len(samples))
+
+	sample_texts = [s.text for s in samples]
+	sample_labels = np.reshape([s.normalized_score(_score_components) for s in samples], [-1, 1])
+	raw_score = np.reshape([s.score(_score_components) for s in samples], [-1, 1])
+
+	sample_vecs = preprocessing.nea.texts_to_vec(sample_texts, vocab, _max_len, exclude_stop_words = _exclude_stop_words)
+
+	print("Predicting..")
+	r2_score, pred = model.score(sample_vecs, sample_labels, return_prediction = True)
+
+	print("\tValid R^2: %.4f"%(r2_score))
+
+	unnormalized_pred = []
+	for idx in range(pred.shape[0]):
+		raw_score = samples[idx].unnormalize(pred[idx], _score_components)
+		unnormalized_pred.append(raw_score)	
+
+	print("\tQWK: %.4f"%preprocessing.score.calculate_qwk(_qwk_score_levels, raw_score, unnormalized_pred))
+
+train()
+#test()
