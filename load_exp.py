@@ -2,6 +2,7 @@ import argparse
 import preprocessing
 import models
 import importlib
+from pathlib import PurePosixPath
 
 def parse_args():
 	parser = argparse.ArgumentParser(description="Loads a testing script under experiments/")
@@ -11,7 +12,8 @@ def parse_args():
 
 try:
 	args = parse_args()
-	module = importlib.import_module('experiments.'+args.script)
+	script_name = PurePosixPath(args.script).stem
+	module = importlib.import_module('experiments.'+script_name)
 except ImportError:
 	print("> Cannot load script '%s', abort."%args.script)
 	exit(-1)
